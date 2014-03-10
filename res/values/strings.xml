@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BulbAction</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_perms">Permissions</string>
+    <string name="title_calendarselect">Choose primary calendar</string>
+
+</resources>
+ 
