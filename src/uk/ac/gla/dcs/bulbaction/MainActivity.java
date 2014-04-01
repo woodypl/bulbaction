@@ -41,7 +41,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	final String TAG = "BulbAction";
-	final String URL = "http://10.10.10.36:8000/";
+	final String URL = "http://10.10.10.28:8000/";
 	//final String URL = "http://192.168.200.105:8000/";
 	
 
@@ -83,7 +83,7 @@ public class MainActivity extends Activity {
 		if (notificationPermissions != null
 				&& notificationPermissions.contains(getPackageName())) {
 			Log.v(TAG, "Verified notification permissions");
-			getApplicationContext().startService(service);
+			//getApplicationContext().startService(service); /* the system should do it for us! */
 		} else {
 			// No permissions - run settings
 			Log.v(TAG, "No permissions to listen for notifications");
@@ -339,7 +339,7 @@ public class MainActivity extends Activity {
 	}
 
 	private void changeLeds() {
-		Log.d(TAG, "Entered changeLeds()");
+		//Log.d(TAG, "Entered changeLeds()");
 		Uri.Builder ub = Uri.parse(URL).buildUpon();
 
 		ub.appendPath("availastrip");
@@ -349,22 +349,8 @@ public class MainActivity extends Activity {
 		ub.appendQueryParameter("pattern", states);
 		final HttpPost req = new HttpPost(URI.create(ub.build().toString()));
 
-		AsyncTask<Void, Void, Void> t = new AsyncTask<Void, Void, Void>() {
-
-			@Override
-			protected Void doInBackground(Void... params) {
-				try {
-					AndroidHttpClient ahc = AndroidHttpClient.newInstance("AvailaStrip");
-					//Log.d(TAG, "Will execute a request...");
-					ahc.execute(req);
-					ahc.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-		};
-		t.execute();
+		NotifyTask a = new NotifyTask();
+		a.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, req); 
 	}
 	
 	private boolean handleNfcText(String message) {

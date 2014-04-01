@@ -24,7 +24,7 @@ import android.util.Log;
 public class NotificationListener extends NotificationListenerService {
 
 	final String TAG = "BulbAction";
-	final String URL = "http://10.10.10.36:8000/";
+	final String URL = "http://10.10.10.28:8000/";
 	//final String URL = "http://192.168.200.105:8000/";
 	AndroidHttpClient ahc;
 
@@ -125,31 +125,8 @@ public class NotificationListener extends NotificationListenerService {
 			req.setEntity(entity);
 		}
 		
-		final HttpPost r = req;
-			Log.d(TAG, "Passing notification for "+pkg+ ".");
-			AsyncTask<Void, Void, Void> t = new AsyncTask<Void, Void, Void>() {
-
-				@Override
-				protected Void doInBackground(Void... params) {
-					try {
-						ahc.execute(r);
-					} catch (IOException e) {
-						
-						e.printStackTrace();
-					}
-					return null;
-				}
-			};
-			t.execute();
-			/*try {
-				t.get();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/	
+		NotifyTask a = new NotifyTask();
+		a.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, req);
 			
 	}
 
