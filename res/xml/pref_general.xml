@@ -12,6 +12,12 @@
         android:key="calendar_list"
         android:id="@+id/calendar_select"
     />
+    <CheckBoxPreference
+        android:id="@+id/ignore_all_day"
+        android:title="@string/ignore_all_day"
+        android:key="ignore_all_day"
+        android:defaultValue="false"
+        />
     <!--android:defaultValue="-1"
         android:entries="@array/pref_example_list_titles"
         android:entryValues="@array/pref_example_list_values"

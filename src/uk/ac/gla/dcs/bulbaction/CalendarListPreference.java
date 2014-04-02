@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.ListPreference;
+import android.preference.PreferenceManager;
 import android.provider.CalendarContract.Calendars;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -154,9 +155,9 @@ public class CalendarListPreference extends ListPreference {
 				List<CalendarPair> calendarList) {
 			super(context, R.layout.row_select_calendar, R.id.rowTextView,
 					calendarList);
-			if (calendarID == -1)
-				calendarID = getContext().getSharedPreferences("BulbAction", Context.MODE_PRIVATE).getLong("calendarID", -1);
-
+			if (calendarID == -1) {
+				calendarID = PreferenceManager.getDefaultSharedPreferences(getContext()).getLong("calendarID", -1);
+			}
 			// Cache the LayoutInflate to avoid asking for a new one each time.
 			inflater = LayoutInflater.from(context);
 		}
@@ -194,7 +195,7 @@ public class CalendarListPreference extends ListPreference {
 						CalendarPair calendar = (CalendarPair) cb.getTag();
 						calendarID = calendar.id;
 						CalendarListPreference.saveCalendar(
-								getContext().getSharedPreferences("BulbAction", Context.MODE_PRIVATE),
+								PreferenceManager.getDefaultSharedPreferences(getContext()),
 								calendarID );
 						for (RadioButton b : buttonList)
 							b.setChecked(false);

@@ -17,6 +17,7 @@ import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Instances;
 import android.provider.Settings;
@@ -50,7 +51,8 @@ public class MainActivity extends Activity {
 	    Instances.EVENT_ID,
 	    Instances.BEGIN,
 	    Instances.END,
-	    Instances.AVAILABILITY
+	    Instances.AVAILABILITY,
+	    Instances.ALL_DAY
 	  };
 	  
 	//Calendar crap ends
@@ -62,6 +64,7 @@ public class MainActivity extends Activity {
 	SharedPreferences prefs = null;
 	static long calendarID = -1;
 	static long lastRefreshed = -1;
+	static boolean ignoreAllDay = false;
 	
 	//static Drawable redCircle, greenCircle, orangeCircle, grayCircle;
 	
@@ -92,9 +95,11 @@ public class MainActivity extends Activity {
 		}
 		ahc = AndroidHttpClient.newInstance("BulbAction notifier");
 		
-		prefs = getSharedPreferences("BulbAction", MODE_PRIVATE);
+		//prefs = getSharedPreferences("BulbAction", MODE_PRIVATE);
+		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		calendarID = prefs.getLong("calendarID", -1);
 		lastRefreshed = prefs.getLong("lastRefreshed", -1);
+		ignoreAllDay = prefs.getBoolean("ignore_all_day", false);
 		
 		if (calendarID == -1)
 			Toast.makeText(getApplicationContext(), "Please select your calendar in settings", Toast.LENGTH_SHORT).show();
@@ -232,11 +237,21 @@ public class MainActivity extends Activity {
 				    long beginVal = 0;    
 				    long endVal  = 0;
 				    int avail = -1;
+				    int allday = 0;
 				    // Get the field values
 				    eventID = cur.getLong(0);
 				    beginVal = cur.getLong(1);
 				    endVal = cur.getLong(2);
 				    avail = cur.getInt(3);
+				    allday = cur.getInt(4);
+				    
+				    //Discount the availability set to "free"
+				    if (avail == Instances.AVAILABILITY_FREE)
+				    	continue;
+				    
+				    //Ignore all day events if the user chose to do so
+				    if (ignoreAllDay && allday == 1)
+				    	continue;
 				    
 				    human.setTimeInMillis(beginVal);
 				    //Log.d(TAG, "Event "+eventID+" starting at "+beginVal+" ("+human.get(Calendar.HOUR_OF_DAY)+")");
@@ -257,6 +272,7 @@ public class MainActivity extends Activity {
 				    }
 				}
 				
+				cur.close();
 				
 				//1 hour = 60 minutes = 3600 seconds = 3600000 ms
 				for (int i = 0; i < 8; ++i) { // integers representing 8 working hours from 9 to 5
@@ -321,6 +337,7 @@ public class MainActivity extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
+		ignoreAllDay = prefs.getBoolean("ignore_all_day", false);
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
 			Parcelable[] rawMsgs = getIntent().getParcelableArrayExtra(
 					NfcAdapter.EXTRA_NDEF_MESSAGES);
