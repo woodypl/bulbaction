@@ -24,8 +24,8 @@ import android.util.Log;
 public class NotificationListener extends NotificationListenerService {
 
 	final String TAG = "BulbAction";
-	final String URL = "http://10.10.10.28:8000/";
-	//final String URL = "http://192.168.200.105:8000/";
+	// final String URL = "http://10.10.10.28:8000/";
+	final String URL = "http://192.168.112.33:8000/";
 	AndroidHttpClient ahc;
 
 	public NotificationListener() {
@@ -41,11 +41,10 @@ public class NotificationListener extends NotificationListenerService {
 	public int onStopCommand(Intent intent, int flags, int startid) {
 		return 0;
 	}
-	
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startid) {
-		
-		
+
 		try {
 			for (StatusBarNotification sbn : getActiveNotifications()) {
 				dispatchSBN(sbn);
@@ -62,18 +61,18 @@ public class NotificationListener extends NotificationListenerService {
 
 	@Override
 	public void onNotificationPosted(StatusBarNotification sbn) {
-		dispatchSBN(sbn);
-		Notification not = sbn.getNotification();
-		Log.v(TAG, "From " + sbn.getPackageName() + sbn.getTag());
-		printNotification(not);
+		dispatchSBN(sbn, false);
+		//Notification not = sbn.getNotification();
+		// Log.v(TAG, "From " + sbn.getPackageName() + sbn.getTag());
+		// printNotification(not);
 
 	}
 
 	@Override
 	public void onNotificationRemoved(StatusBarNotification sbn) {
 		Log.v(TAG, "A notification was removed:");
-		printNotification(sbn.getNotification());
-
+		// printNotification(sbn.getNotification());
+		dispatchSBN(sbn, true);
 	}
 
 	@Override
@@ -92,14 +91,24 @@ public class NotificationListener extends NotificationListenerService {
 	}
 
 	void dispatchSBN(StatusBarNotification sbn) {
+		dispatchSBN(sbn, false);
+	}
+	
+	void dispatchSBN(StatusBarNotification sbn, boolean remove) {
 		String pkg = sbn.getPackageName();
 		Notification not = sbn.getNotification();
 		int msgcount = not.number;
 		Bitmap senderIcon = not.largeIcon;
-		
+
 		Uri.Builder ub = Uri.parse(URL).buildUpon();
 
-		ub.appendPath("notify");
+		if (remove) {
+			ub.appendPath("denotify");
+		} else {
+			ub.appendPath("notify");
+		}
+		
+		ub.appendQueryParameter("id", Integer.toString(sbn.getId()));
 
 		ub.appendQueryParameter("count", Integer.toString(msgcount));
 		ub.appendQueryParameter("pkg", pkg);
@@ -114,7 +123,7 @@ public class NotificationListener extends NotificationListenerService {
 		Object txt = not.extras.get(Notification.EXTRA_TEXT);
 		if (txt != null)
 			ub.appendQueryParameter("txt", txt.toString());
-		
+
 		HttpPost req = new HttpPost(URI.create(ub.build().toString()));
 
 		if (senderIcon != null) {
@@ -124,10 +133,10 @@ public class NotificationListener extends NotificationListenerService {
 
 			req.setEntity(entity);
 		}
-		
+
 		NotifyTask a = new NotifyTask();
 		a.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, req);
-			
+
 	}
 
 }
