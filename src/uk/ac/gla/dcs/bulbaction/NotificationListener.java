@@ -9,10 +9,15 @@ import java.util.concurrent.ExecutionException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Notification;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
@@ -25,8 +30,9 @@ public class NotificationListener extends NotificationListenerService {
 
 	final String TAG = "BulbAction";
 	// final String URL = "http://10.10.10.28:8000/";
-	final String URL = "http://192.168.112.33:8000/";
+	//final String URL = "http://192.168.112.33:8000/";
 	AndroidHttpClient ahc;
+	static String gaccount = "";
 
 	public NotificationListener() {
 		Log.v(TAG, "NotificationListener instantiated.");
@@ -36,6 +42,13 @@ public class NotificationListener extends NotificationListenerService {
 	@Override
 	public void onCreate() {
 		Log.v(TAG, "NotificationListener created.");
+		AccountManager manager = (AccountManager) this.getBaseContext().getSystemService(ACCOUNT_SERVICE);
+		Account[] list = manager.getAccounts();
+		for (Account a : list) {
+			if (a.type.equals("com.google")) {
+				gaccount = a.name;
+			}
+		}
 	}
 
 	public int onStopCommand(Intent intent, int flags, int startid) {
@@ -98,9 +111,18 @@ public class NotificationListener extends NotificationListenerService {
 		String pkg = sbn.getPackageName();
 		Notification not = sbn.getNotification();
 		int msgcount = not.number;
-		Bitmap senderIcon = not.largeIcon;
+		
+		Bitmap senderIcon;
+		
+		if (not.largeIcon != null) {
+			senderIcon = not.largeIcon;
+		}
+		else { //must be set
+			senderIcon  = BitmapFactory.decodeResource(getResources(), not.icon);
+		}
+		
 
-		Uri.Builder ub = Uri.parse(URL).buildUpon();
+		Uri.Builder ub = Uri.parse(MainActivity.URL).buildUpon();
 
 		if (remove) {
 			ub.appendPath("denotify");
@@ -123,6 +145,8 @@ public class NotificationListener extends NotificationListenerService {
 		Object txt = not.extras.get(Notification.EXTRA_TEXT);
 		if (txt != null)
 			ub.appendQueryParameter("txt", txt.toString());
+		if (gaccount != "")
+			ub.appendQueryParameter("account", gaccount);
 
 		HttpPost req = new HttpPost(URI.create(ub.build().toString()));
 

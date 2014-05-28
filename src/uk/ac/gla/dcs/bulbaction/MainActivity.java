@@ -42,11 +42,11 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	final String TAG = "BulbAction";
-	final String URL = "http://10.10.10.28:8000/";
+	final static String URL = "http://10.10.10.30:8000/";
 	//final String URL = "http://192.168.200.105:8000/";
 	
 
-	//Calendar crap begins
+	//	Calendar crap begins
 	public static final String[] INSTANCE_PROJECTION = new String[] {
 	    Instances.EVENT_ID,
 	    Instances.BEGIN,
