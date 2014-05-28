@@ -12,7 +12,9 @@ import org.apache.http.entity.ByteArrayEntity;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -118,7 +120,15 @@ public class NotificationListener extends NotificationListenerService {
 			senderIcon = not.largeIcon;
 		}
 		else { //must be set
-			senderIcon  = BitmapFactory.decodeResource(getResources(), not.icon);
+			Context remote;
+			try {
+				remote = createPackageContext(pkg, 0);
+				senderIcon  = BitmapFactory.decodeResource(remote.getResources(), not.icon);
+			} catch (NameNotFoundException e) {
+				senderIcon = null;
+				Log.e(TAG, "Could not find the icon for the notification!");
+			}
+			
 		}
 		
 
