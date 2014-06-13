@@ -41,9 +41,6 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-	final String TAG = "BulbAction";
-	final static String URL = "http://10.10.10.30:8000/";
-	//final String URL = "http://192.168.200.105:8000/";
 	
 
 	//	Calendar crap begins
@@ -85,11 +82,11 @@ public class MainActivity extends Activity {
 				getContentResolver(), "enabled_notification_listeners");
 		if (notificationPermissions != null
 				&& notificationPermissions.contains(getPackageName())) {
-			Log.v(TAG, "Verified notification permissions");
+			Log.v(Constants.LOG_TAG, "Verified notification permissions");
 			//getApplicationContext().startService(service); /* the system should do it for us! */
 		} else {
 			// No permissions - run settings
-			Log.v(TAG, "No permissions to listen for notifications");
+			Log.v(Constants.LOG_TAG, "No permissions to listen for notifications");
 			startActivity(new Intent(
 					"android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
 		}
@@ -268,7 +265,7 @@ public class MainActivity extends Activity {
 				    }
 			
 				    for (int i = 0; i < durations.length; ++i) {
-				    	Log.d(TAG, "Duration at "+i+": "+durations[i]);
+				    	Log.d(Constants.LOG_TAG, "Duration at "+i+": "+durations[i]);
 				    }
 				}
 				
@@ -314,7 +311,7 @@ public class MainActivity extends Activity {
 			prefs.edit().putString("ledStates", ledstatesprefs.toString()).commit();
 		} catch (JSONException e) {
 			//Well, tough
-			Log.e(TAG, "Could not save LED states!");
+			Log.e(Constants.LOG_TAG, "Could not save LED states!");
 		}
 		ahc.close();
 		stopService(service);
@@ -329,7 +326,7 @@ public class MainActivity extends Activity {
 			prefs.edit().putString("ledStates", ledstatesprefs.toString()).commit();
 		} catch (JSONException e) {
 			//Well, tough
-			Log.e(TAG, "Could not save LED states!");
+			Log.e(Constants.LOG_TAG, "Could not save LED states!");
 		}
 		super.onPause();
 	}
@@ -357,7 +354,7 @@ public class MainActivity extends Activity {
 
 	private void changeLeds() {
 		//Log.d(TAG, "Entered changeLeds()");
-		Uri.Builder ub = Uri.parse(URL).buildUpon();
+		Uri.Builder ub = Uri.parse(Constants.URL).buildUpon();
 
 		ub.appendPath("availastrip");
 		String states = "";
@@ -374,7 +371,7 @@ public class MainActivity extends Activity {
 		Toast.makeText(getApplicationContext(),
 				"Registering tag " + message, Toast.LENGTH_SHORT)
 				.show();
-		Uri.Builder ub = Uri.parse(URL).buildUpon();
+		Uri.Builder ub = Uri.parse(Constants.URL).buildUpon();
 
 		ub.appendPath("nfctag");
 		ub.appendQueryParameter("txt", message);
@@ -413,6 +410,9 @@ public class MainActivity extends Activity {
 		case R.id.action_perms:
 			startActivity(new Intent(
 					"android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+			return true;
+		case R.id.action_notifications:
+			startActivity(new Intent(this, EditNotificationActivity.class));
 			return true;
 
 		}

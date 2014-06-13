@@ -101,6 +101,8 @@ public class SettingsActivity extends PreferenceActivity {
 		addPreferencesFromResource(R.xml.pref_general);
 
 		bindPreferenceSummaryToValue(findPreference("calendar_list"));
+		bindPreferenceSummaryToValue(findPreference("dim_start_time"));
+		bindPreferenceSummaryToValue(findPreference("dim_stop_time"));
 	}
 
 	/** {@inheritDoc} */
@@ -206,6 +208,8 @@ public class SettingsActivity extends PreferenceActivity {
 			// updated to reflect the new value, per the Android Design
 			// guidelines.
 			bindPreferenceSummaryToValue(findPreference("calendar_list"));
+			bindPreferenceSummaryToValue(findPreference("dim_start_time"));
+			bindPreferenceSummaryToValue(findPreference("dim_stop_time"));
 		}
 	}
 

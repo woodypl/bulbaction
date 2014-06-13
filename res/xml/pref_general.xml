@@ -18,6 +18,23 @@
         android:key="ignore_all_day"
         android:defaultValue="false"
         />
+    <CheckBoxPreference
+        android:id="@+id/auto_dim"
+        android:title="@string/auto_dim"
+        android:key="auto_dim"
+        android:defaultValue="false"
+        />
+    <uk.ac.gla.dcs.bulbaction.TimePreference
+        android:title="@string/dim_start_time"
+        android:key="dim_start_time"
+        android:id="@+id/dim_start_time"
+    />
+    
+    <uk.ac.gla.dcs.bulbaction.TimePreference
+        android:title="@string/dim_stop_time"
+        android:key="dim_stop_time"
+        android:id="@+id/dim_stop_time"
+    />
     <!--android:defaultValue="-1"
         android:entries="@array/pref_example_list_titles"
         android:entryValues="@array/pref_example_list_values"
